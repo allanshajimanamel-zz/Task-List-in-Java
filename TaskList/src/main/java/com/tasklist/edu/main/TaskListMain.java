@@ -13,29 +13,46 @@ import com.tasklist.edu.exception.DBConnectionException;
 import com.tasklist.edu.exception.NoTaskFoundException;
 
 /**
- * Hello world!
+ * This is the main class of the application. it contains the main method from
+ * where the execution starts.
+ *
+ * @author ALLAN
  *
  */
 public class TaskListMain {
 
+	/**
+	 * The main method, which is the starting point of the application.
+	 *
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		System.out.println(ConsoleTexts.WELCOME_MESSAGE);
 		new TaskListMain().start();
 	}
 
+	/**
+	 * The method is called controls the processing in the application.
+	 */
 	private void start() {
 		boolean loadSuccess = false;
 		BufferedReader bufferRead = null;
 		try {
+			// setup the database.
 			loadSuccess = TaskListDAO.setupDB();
+			// Infinite loop which is broken out of when the user enters the
+			// quit command.
 			cmdloop: while (loadSuccess) {
 				System.out.print(ConsoleTexts.ENTER_COMMAND_SYMBOL);
 				bufferRead = new BufferedReader(
 						new InputStreamReader(System.in));
 				try {
+					// read the user command input.
 					String cmdString = bufferRead.readLine();
+					// get the command details.
 					CommandDO commandDO = CommandUtil.getCommandData(cmdString);
 					if (commandDO != null) {
+						// perform task related to the input command.
 						switch (commandDO.getCommands()) {
 						case HELP:
 							printHelp();
@@ -168,10 +185,24 @@ public class TaskListMain {
 		}
 	}
 
+	/**
+	 * The method prints out the contents for the help command.
+	 */
 	public void printHelp() {
 		System.out.println(ConsoleTexts.HELP);
 	}
 
+	/**
+	 * The method adds the provided to-do task to the list.
+	 *
+	 * @param param
+	 *            the data for the to-do task.
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws DBConnectionException
+	 */
 	public void addToList(String param) throws InstantiationException,
 	IllegalAccessException, ClassNotFoundException, SQLException,
 	DBConnectionException {
@@ -185,6 +216,15 @@ public class TaskListMain {
 		}
 	}
 
+	/**
+	 * The method prints the to-do tasks in the list.
+	 *
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws DBConnectionException
+	 */
 	public void printList() throws InstantiationException,
 	IllegalAccessException, ClassNotFoundException, SQLException,
 	DBConnectionException {
@@ -199,6 +239,17 @@ public class TaskListMain {
 		}
 	}
 
+	/**
+	 * The method prints the to-do task whoes position in the list is given.
+	 *
+	 * @param param
+	 *            position of the to-do task in list
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws DBConnectionException
+	 */
 	public void printTask(String param) throws InstantiationException,
 	IllegalAccessException, ClassNotFoundException, SQLException,
 	DBConnectionException {
@@ -211,6 +262,18 @@ public class TaskListMain {
 		}
 	}
 
+	/**
+	 * The method removes the to-do task whoes position in the list is provided.
+	 *
+	 * @param param
+	 *            position of the to-do task in list
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws NoTaskFoundException
+	 * @throws DBConnectionException
+	 */
 	public void taskDone(String param) throws InstantiationException,
 	IllegalAccessException, ClassNotFoundException, SQLException,
 	NoTaskFoundException, DBConnectionException {

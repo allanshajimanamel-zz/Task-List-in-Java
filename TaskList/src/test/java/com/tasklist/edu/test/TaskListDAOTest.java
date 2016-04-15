@@ -15,6 +15,8 @@ import com.tasklist.edu.exception.NoTaskFoundException;
 import com.tasklist.edu.main.TaskListDAO;
 
 /**
+ * Test class to {@link Test} {@link TaskListDAO}.
+ *
  * @author ALLAN
  *
  */

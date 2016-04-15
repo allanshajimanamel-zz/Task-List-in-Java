@@ -1,6 +1,9 @@
 package com.tasklist.edu.exception;
 
 /**
+ * The exception class is used to throw an exception if we fail to get a
+ * connection to the database.
+ *
  * @author ALLAN
  *
  */

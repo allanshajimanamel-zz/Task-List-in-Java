@@ -3,6 +3,10 @@ package com.tasklist.edu.dataobject;
 import java.util.LinkedList;
 
 /**
+ *
+ * The class represents the list of to-do tasks implemented as a
+ * {@link LinkedList}.
+ *
  * @author ALLAN
  *
  */

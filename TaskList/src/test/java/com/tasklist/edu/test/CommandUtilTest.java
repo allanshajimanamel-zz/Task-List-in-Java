@@ -9,6 +9,8 @@ import com.tasklist.edu.dataobject.CommandDO;
 import com.tasklist.edu.main.CommandUtil;
 
 /**
+ * Test class for {@link CommandUtil}
+ *
  * @author ALLAN
  *
  */

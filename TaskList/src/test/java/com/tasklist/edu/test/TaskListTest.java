@@ -15,6 +15,8 @@ import com.tasklist.edu.main.TaskListDAO;
 import com.tasklist.edu.main.TaskListMain;
 
 /**
+ *
+ * Test class for {@link TaskListMain}
  * @author ALLAN
  *
  */
