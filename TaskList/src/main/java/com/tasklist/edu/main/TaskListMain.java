@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.tasklist.edu.constants.Commands;
 import com.tasklist.edu.constants.ConsoleTexts;
+import com.tasklist.edu.dataobject.CommandDO;
 import com.tasklist.edu.dataobject.Todo;
 import com.tasklist.edu.dataobject.TodoList;
 
@@ -48,79 +48,59 @@ public class TaskListMain {
 						new InputStreamReader(System.in));
 				try {
 					String cmdString = bufferRead.readLine();
-					String param = "";
-					Commands cmd;
-					if (cmdString.startsWith(Commands.ADD.toString()
-							.toLowerCase())
-							&& cmdString.charAt(cmdString.indexOf(Commands.ADD
-									.toString().toLowerCase()) + 3) == ' ') {
-						param = cmdString
-								.substring(cmdString.indexOf(Commands.ADD
-										.toString().toLowerCase()) + 4);
-						cmd = Commands.ADD;
-					} else if (cmdString.startsWith(Commands.TASKID.toString()
-							.toLowerCase())
-							&& cmdString.charAt(cmdString
-									.indexOf(Commands.TASKID.toString()
-											.toLowerCase()) + 6) == ' ') {
-						param = cmdString.substring(cmdString
-								.indexOf(Commands.TASKID.toString()
-										.toLowerCase()) + 7);
-						cmd = Commands.TASKID;
-					} else if (cmdString.startsWith(Commands.DONE.toString()
-							.toLowerCase())
-							&& cmdString.charAt(cmdString.indexOf(Commands.DONE
-									.toString().toLowerCase()) + 4) == ' ') {
-						param = cmdString
-								.substring(cmdString.indexOf(Commands.DONE
-										.toString().toLowerCase()) + 5);
-						cmd = Commands.DONE;
+					CommandDO commandDO = CommandUtil.getCommandData(cmdString);
+					if (commandDO != null) {
+						switch (commandDO.getCommands()) {
+						case HELP:
+							printHelp();
+							break;
+						case ADD:
+							addToList(commandDO.getParam());
+							break;
+						case LIST:
+							printList();
+							break;
+						case TASKID:
+							try {
+								printTask(commandDO.getParam());
+							} catch (NumberFormatException e) {
+								System.out
+								.println(ConsoleTexts.INVALID_TASK_ID);
+							} catch (IndexOutOfBoundsException e) {
+								System.out
+								.println(ConsoleTexts.INVALID_TASK_ID);
+							}
+							break;
+						case DONE:
+							try {
+								taskDone(commandDO.getParam());
+							} catch (NumberFormatException e) {
+								System.out
+								.println(ConsoleTexts.INVALID_TASK_ID);
+							} catch (IndexOutOfBoundsException e) {
+								System.out
+								.println(ConsoleTexts.INVALID_TASK_ID);
+							}
+							break;
+						case SAVE:
+							try {
+								saveList();
+							} catch (FileNotFoundException e) {
+								System.out
+								.println(ConsoleTexts.ERROR_SAVE_FAIL);
+							} catch (IOException e) {
+								System.out
+								.println(ConsoleTexts.ERROR_SAVE_FAIL);
+							}
+							break;
+						case QUIT:
+							break cmdloop;
+						default:
+							System.out.println(ConsoleTexts.UNKOWN_COMMAND);
+							break;
+						}
 					} else {
-						cmd = Commands.valueOf(cmdString.toUpperCase().trim());
-					}
-
-					switch (cmd) {
-					case HELP:
-						printHelp();
-						break;
-					case ADD:
-						addToList(param);
-						break;
-					case LIST:
-						printList();
-						break;
-					case TASKID:
-						try {
-							printTask(param);
-						} catch (NumberFormatException e) {
-							System.out.println(ConsoleTexts.INVALID_TASK_ID);
-						} catch (IndexOutOfBoundsException e) {
-							System.out.println(ConsoleTexts.INVALID_TASK_ID);
-						}
-						break;
-					case DONE:
-						try {
-							taskDone(param);
-						} catch (NumberFormatException e) {
-							System.out.println(ConsoleTexts.INVALID_TASK_ID);
-						} catch (IndexOutOfBoundsException e) {
-							System.out.println(ConsoleTexts.INVALID_TASK_ID);
-						}
-						break;
-					case SAVE:
-						try {
-							saveList();
-						} catch (FileNotFoundException e) {
-							System.out.println(ConsoleTexts.ERROR_SAVE_FAIL);
-						} catch (IOException e) {
-							System.out.println(ConsoleTexts.ERROR_SAVE_FAIL);
-						}
-						break;
-					case QUIT:
-						break cmdloop;
-					default:
 						System.out.println(ConsoleTexts.UNKOWN_COMMAND);
-						break;
 					}
 				} catch (IOException e) {
 					System.out.println(ConsoleTexts.CONSOLE_ERROR);
@@ -177,15 +157,18 @@ public class TaskListMain {
 	}
 
 	public void addToList(String param) {
+		System.out.print(ConsoleTexts.OUTPUT);
 		if (param.isEmpty()) {
 			System.out.println(ConsoleTexts.EMPTY_TODO);
 		} else {
 			Todo todo = new Todo(param);
 			this.list.addLast(todo);
+			System.out.println(ConsoleTexts.TASK_ADDED+this.list.size());
 		}
 	}
 
 	public void printList() {
+		System.out.println(ConsoleTexts.OUTPUT);
 		if (this.list.size() > 0) {
 			for (int i = 0; i < this.list.size(); i++) {
 				System.out.println((i + 1) + ". " + this.list.get(i).getTodo());
@@ -196,6 +179,7 @@ public class TaskListMain {
 	}
 
 	public void printTask(String param) {
+		System.out.println(ConsoleTexts.OUTPUT);
 		Integer id = Integer.valueOf(param);
 		System.out.println("Task: " + this.list.get(id - 1).getTodo());
 	}
@@ -213,5 +197,6 @@ public class TaskListMain {
 		outputStream = new ObjectOutputStream(new FileOutputStream(SER_FILE));
 		outputStream.writeObject(list);
 		outputStream.close();
+		System.out.println(ConsoleTexts.SAVE_SUCCESS);
 	}
 }
