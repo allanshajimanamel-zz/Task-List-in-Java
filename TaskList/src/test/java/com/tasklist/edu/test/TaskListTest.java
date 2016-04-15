@@ -1,15 +1,17 @@
 package com.tasklist.edu.test;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
-import com.tasklist.edu.dataobject.Todo;
-import com.tasklist.edu.dataobject.TodoList;
+import com.tasklist.edu.exception.DBConnectionException;
+import com.tasklist.edu.exception.NoTaskFoundException;
+import com.tasklist.edu.main.TaskListDAO;
 import com.tasklist.edu.main.TaskListMain;
 
 /**
@@ -21,84 +23,129 @@ public class TaskListTest {
 	/**
 	 * @throws java.lang.Exception
 	 */
+	@Before
+	public void setUp() throws Exception {
+		Connection conn = null;
+		TaskListDAO dao = null;
+		try {
+			dao = new TaskListDAO();
+			conn = dao.getConnection();
+			TaskListDAO.setupDB();
+			PreparedStatement ps = conn
+					.prepareStatement("DELETE FROM todo_list");
+			ps.executeUpdate();
+			dao.addToDo("Task 1");
+			dao.addToDo("Task 2");
+			dao.addToDo("Task 3");
+			dao.addToDo("Task 4");
+		} finally {
+			if (conn != null)
+				conn.close();
+		}
+
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
 	@After
 	public void tearDown() throws Exception {
-		File file = new File("todolist.ser");
-		file.deleteOnExit();
+		Connection conn = null;
+		TaskListDAO dao = null;
+		try {
+			dao = new TaskListDAO();
+			conn = dao.getConnection();
+			PreparedStatement ps = conn
+					.prepareStatement("DELETE FROM todo_list");
+			ps.executeUpdate();
+		} finally {
+			if (conn != null)
+				conn.close();
+		}
 	}
 
 	/**
-	 * Test method for {@link com.tasklist.edu.main.TaskListMain#loadList()}.
+	 * Test method for
+	 * {@link com.tasklist.edu.main.TaskListMain#addToList(java.lang.String)}.
 	 *
-	 * @throws IOException
+	 * @throws Exception
+	 */
+	@Test
+	public void testAddTaskSuccess() throws Exception {
+		setUp();
+		TaskListDAO dao = new TaskListDAO();
+		int initialCount = dao.getCount();
+		new TaskListMain().addToList("Task 5");
+		int finalCount = dao.getCount();
+		Assert.assertTrue((initialCount + 1) == (finalCount));
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.tasklist.edu.main.TaskListMain#addToList(java.lang.String)}.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testAddTaskFailure() throws Exception {
+		setUp();
+		TaskListDAO dao = new TaskListDAO();
+		int initialCount = dao.getCount();
+		new TaskListMain().addToList("");
+		int finalCount = dao.getCount();
+		Assert.assertTrue((initialCount) == (finalCount));
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.tasklist.edu.main.TaskListMain#taskDone(java.lang.String)}.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testTaskDoneSuccess() throws Exception {
+		setUp();
+		TaskListDAO dao = new TaskListDAO();
+		int initialCount = dao.getCount();
+		new TaskListMain().taskDone("2");
+		int finalCount = dao.getCount();
+		Assert.assertTrue((initialCount - 1) == finalCount);
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.tasklist.edu.main.TaskListMain#taskDone(java.lang.String)}.
+	 *
+	 * @throws DBConnectionException
+	 * @throws NoTaskFoundException
+	 * @throws SQLException
 	 * @throws ClassNotFoundException
-	 */
-	@Test
-	public void testLoadList() throws ClassNotFoundException, IOException {
-		assertTrue(new TaskListMain().loadList());
-	}
-
-	/**
-	 * Test method for
-	 * {@link com.tasklist.edu.main.TaskListMain#addToList(java.lang.String)}.
-	 */
-	@Test
-	public void testAddToListSuccess() {
-		TodoList list = getTodoList();
-		new TaskListMain(list).addToList("task 5");
-		assertTrue(list.size() == 5);
-	}
-
-	/**
-	 * Test method for
-	 * {@link com.tasklist.edu.main.TaskListMain#addToList(java.lang.String)}.
-	 */
-	@Test
-	public void testAddToListFailure() {
-		TodoList list = getTodoList();
-		new TaskListMain(list).addToList("");
-		assertTrue(list.size() == 4);
-	}
-
-	/**
-	 * Test method for
-	 * {@link com.tasklist.edu.main.TaskListMain#taskDone(java.lang.String)}.
-	 */
-	@Test
-	public void testTaskDoneSuccess() {
-		TodoList list = getTodoList();
-		new TaskListMain(list).taskDone("2");
-		assertTrue(list.size() == 3);
-	}
-
-	/**
-	 * Test method for
-	 * {@link com.tasklist.edu.main.TaskListMain#taskDone(java.lang.String)}.
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
 	@Test(expected = NumberFormatException.class)
-	public void testTaskDoneFailure1() {
-		TodoList list = getTodoList();
-		new TaskListMain(list).taskDone("aaa");
-		assertTrue(list.size() == 4);
+	public void testTaskDoneFailure1() throws InstantiationException,
+	IllegalAccessException, ClassNotFoundException, SQLException,
+	NoTaskFoundException, DBConnectionException {
+		new TaskListMain().taskDone("aaa");
 	}
 
 	/**
 	 * Test method for
 	 * {@link com.tasklist.edu.main.TaskListMain#taskDone(java.lang.String)}.
+	 *
+	 * @throws DBConnectionException
+	 * @throws NoTaskFoundException
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
-	@Test(expected = IndexOutOfBoundsException.class)
-	public void testTaskDoneFailure2() {
-		TodoList list = getTodoList();
-		new TaskListMain(list).taskDone("8");
-		assertTrue(list.size() == 4);
+	@Test(expected = NoTaskFoundException.class)
+	public void testTaskDoneFailure2() throws InstantiationException,
+	IllegalAccessException, ClassNotFoundException, SQLException,
+	NoTaskFoundException, DBConnectionException {
+		new TaskListMain().taskDone("8");
 	}
 
-	private TodoList getTodoList() {
-		TodoList list = new TodoList();
-		for (int i = 0; i < 4; i++) {
-			Todo todo = new Todo("task " + (i + 1));
-			list.add(todo);
-		}
-		return list;
-	}
 }

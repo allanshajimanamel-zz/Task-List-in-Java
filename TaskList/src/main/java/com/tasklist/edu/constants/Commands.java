@@ -5,5 +5,12 @@ package com.tasklist.edu.constants;
  *
  */
 public enum Commands {
-	HELP,ADD,LIST,TASKID,DONE,SAVE,QUIT;
+	HELP("<help>"), ADD("<add> "), LIST("<list>"), TASKID("<taskid> "), DONE(
+			"<done> "), QUIT("<quit>");
+
+	public String value;
+
+	private Commands(String value) {
+		this.value = value;
+	}
 }
