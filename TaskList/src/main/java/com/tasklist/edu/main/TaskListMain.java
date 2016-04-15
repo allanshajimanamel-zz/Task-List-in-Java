@@ -132,24 +132,27 @@ public class TaskListMain {
 	}
 
 	public boolean loadList() throws IOException, ClassNotFoundException {
-		ObjectInputStream oi;
-		try {
-			oi = new ObjectInputStream(new FileInputStream(SER_FILE));
-			Object data = oi.readObject();
-			this.list = (TodoList) data;
-			oi.close();
-		} catch (FileNotFoundException e) {
-			// An already serialized object does not exist so initializing .
-			this.list = new TodoList();
+		synchronized (this) {
+
+			ObjectInputStream oi;
 			try {
-				saveList();
-			} catch (FileNotFoundException ee) {
-				System.out.println(ConsoleTexts.ERROR_SAVE_FAIL);
-			} catch (IOException ee) {
-				System.out.println(ConsoleTexts.ERROR_SAVE_FAIL);
+				oi = new ObjectInputStream(new FileInputStream(SER_FILE));
+				Object data = oi.readObject();
+				this.list = (TodoList) data;
+				oi.close();
+			} catch (FileNotFoundException e) {
+				// An already serialized object does not exist so initializing .
+				this.list = new TodoList();
+				try {
+					saveList();
+				} catch (FileNotFoundException ee) {
+					System.out.println(ConsoleTexts.ERROR_SAVE_FAIL);
+				} catch (IOException ee) {
+					System.out.println(ConsoleTexts.ERROR_SAVE_FAIL);
+				}
 			}
+			return true;
 		}
-		return true;
 	}
 
 	public void printHelp() {
@@ -163,7 +166,7 @@ public class TaskListMain {
 		} else {
 			Todo todo = new Todo(param);
 			this.list.addLast(todo);
-			System.out.println(ConsoleTexts.TASK_ADDED+this.list.size());
+			System.out.println(ConsoleTexts.TASK_ADDED + this.list.size());
 		}
 	}
 
@@ -193,10 +196,13 @@ public class TaskListMain {
 	}
 
 	public void saveList() throws FileNotFoundException, IOException {
-		ObjectOutputStream outputStream;
-		outputStream = new ObjectOutputStream(new FileOutputStream(SER_FILE));
-		outputStream.writeObject(list);
-		outputStream.close();
-		System.out.println(ConsoleTexts.SAVE_SUCCESS);
+		synchronized (this) {
+			ObjectOutputStream outputStream;
+			outputStream = new ObjectOutputStream(
+					new FileOutputStream(SER_FILE));
+			outputStream.writeObject(list);
+			outputStream.close();
+			System.out.println(ConsoleTexts.SAVE_SUCCESS);
+		}
 	}
 }
