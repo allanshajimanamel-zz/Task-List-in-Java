@@ -11,7 +11,9 @@ public class CommandUtil {
 
 	public static CommandDO getCommandData(String cmdString) {
 		CommandDO command = null;
-		if (cmdString.regionMatches(0, Commands.ADD.value, 0, 6)
+		if (cmdString == null) {
+			return command;
+		} else if (cmdString.regionMatches(0, Commands.ADD.value, 0, 6)
 				&& !cmdString.substring(6).trim().isEmpty()) {
 			command = new CommandDO();
 			command.setCommands(Commands.ADD);
