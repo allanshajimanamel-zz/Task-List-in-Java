@@ -15,39 +15,70 @@ import com.tasklist.edu.dataobject.Todo;
 import com.tasklist.edu.dataobject.TodoList;
 
 /**
- * Hello world!
+ * This is the main class of the application. it contains the main method from
+ * where the execution starts.
+ *
+ * @author ALLAN
  *
  */
 public class TaskListMain {
 
+	/**
+	 * File name in which the to-do task list is serialized to.
+	 */
 	private static final String SER_FILE = "todolist.ser";
 
+	/**
+	 * The list that holds the to-do task list.
+	 */
 	private TodoList list;
 
+	/**
+	 * Constructor.
+	 */
 	public TaskListMain() {
 
 	}
 
+	/**
+	 * Constructor.
+	 *
+	 * @param list
+	 *            An instance of {@link TodoList} to set.
+	 */
 	public TaskListMain(TodoList list) {
 		this.list = list;
 	}
 
+	/**
+	 * The main method, which is the starting point of the application.
+	 *
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		System.out.println(ConsoleTexts.WELCOME_MESSAGE);
 		new TaskListMain().start();
 	}
 
+	/**
+	 * The method controls the processing in the application.
+	 */
 	private void start() {
 		boolean loadSuccess = false;
 		BufferedReader bufferRead = null;
 		try {
+			// Load the list.
 			loadSuccess = loadList();
+			// Infinite loop which is broken out of when the user enters the
+			// quit command.
 			cmdloop: while (loadSuccess) {
 				System.out.print(ConsoleTexts.ENTER_COMMAND_SYMBOL);
 				bufferRead = new BufferedReader(
 						new InputStreamReader(System.in));
 				try {
+					// read the user command input.
 					String cmdString = bufferRead.readLine();
+					// get the command details.
 					CommandDO commandDO = CommandUtil.getCommandData(cmdString);
 					if (commandDO != null) {
 						switch (commandDO.getCommands()) {
@@ -131,6 +162,18 @@ public class TaskListMain {
 		}
 	}
 
+	/**
+	 * De-serializes the file 'todolist.ser' if present and loads
+	 * {@link TodoList} object with the to-do task list. If the file is not
+	 * present, it creates a new {@link TodoList} object and serializes it to
+	 * the file 'todolist.ser'.
+	 *
+	 * Note: The method is synchronised.
+	 *
+	 * @return <code>true</code> if load was successful else <code>false</code>
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public boolean loadList() throws IOException, ClassNotFoundException {
 		synchronized (this) {
 
@@ -155,10 +198,19 @@ public class TaskListMain {
 		}
 	}
 
+	/**
+	 * The method prints out the contents for the help command.
+	 */
 	public void printHelp() {
 		System.out.println(ConsoleTexts.HELP);
 	}
 
+	/**
+	 * The method adds the provided to-do task to the list.
+	 *
+	 * @param param
+	 *            The data for the task.
+	 */
 	public void addToList(String param) {
 		System.out.print(ConsoleTexts.OUTPUT);
 		if (param.isEmpty()) {
@@ -170,6 +222,9 @@ public class TaskListMain {
 		}
 	}
 
+	/**
+	 * The method prints the to-do tasks in the list.
+	 */
 	public void printList() {
 		System.out.println(ConsoleTexts.OUTPUT);
 		if (this.list.size() > 0) {
@@ -181,12 +236,24 @@ public class TaskListMain {
 		}
 	}
 
+	/**
+	 * The method prints the to-do task whoes position in the list is given.
+	 *
+	 * @param param
+	 *            The position of the to-do task in list
+	 */
 	public void printTask(String param) {
 		System.out.println(ConsoleTexts.OUTPUT);
 		Integer id = Integer.valueOf(param);
 		System.out.println("Task: " + this.list.get(id - 1).getTodo());
 	}
 
+	/**
+	 * The method removes the to-do task whoes position in the list is provided.
+	 *
+	 * @param param
+	 *            position of the to-do task in list
+	 */
 	public void taskDone(String param) {
 		Integer id = Integer.valueOf(param);
 		// To check for valid task id.
@@ -195,6 +262,15 @@ public class TaskListMain {
 		printList();
 	}
 
+	/**
+	 * The method serializes the to-do task list object {@link TodoList} to the
+	 * file 'todolist.ser'.
+	 *
+	 * Note: The method is synchronised.
+	 *
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public void saveList() throws FileNotFoundException, IOException {
 		synchronized (this) {
 			ObjectOutputStream outputStream;
