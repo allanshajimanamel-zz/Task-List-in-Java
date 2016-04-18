@@ -10,7 +10,7 @@ public class ConsoleTexts {
 	/**
 	 * Constant for welcome message.
 	 */
-	public static final String WELCOME_MESSAGE = "Task list application started.\nPlease use help command to view list of commands available.";
+	public static final String WELCOME_MESSAGE = "Task list application started.\nPlease use <help> command to view list of commands available.";
 
 	/**
 	 * Constant for the input symbol.
