@@ -161,9 +161,10 @@ public class TaskListDAO {
 					ResultSet.TYPE_SCROLL_INSENSITIVE,
 					ResultSet.CONCUR_READ_ONLY);
 			rs = pStatement.executeQuery();
+
+			// move the cursor to the given position.
+			rs.absolute(num - 1);
 			if (rs.next()) {
-				// move the cursor to the given position.
-				rs.absolute(num);
 				todo = new Todo();
 				todo.setTodo(rs.getString(SQLConstants.TODO_COLUMN));
 			}
@@ -200,10 +201,10 @@ public class TaskListDAO {
 					ResultSet.CONCUR_READ_ONLY);
 			rs = pStatement1.executeQuery();
 
+			// Move the cursor to the given position and fetch the id of the
+			// task.
+			rs.absolute(num - 1);
 			if (rs.next()) {
-				// Move the cursor to the given position and fetch the id of the
-				// task.
-				rs.absolute(num);
 				id = rs.getInt(SQLConstants.ID_COLUMN);
 			}
 			if (id != null) {

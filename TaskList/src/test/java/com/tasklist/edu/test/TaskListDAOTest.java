@@ -152,11 +152,11 @@ public class TaskListDAOTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test(expected = SQLException.class)
+	@Test
 	public void testGetTaskFailure() throws Exception {
 		setUp();
 		TaskListDAO dao = new TaskListDAO();
-		dao.getTask(5);
+		Assert.assertNull(dao.getTask(5));
 	}
 
 	/**

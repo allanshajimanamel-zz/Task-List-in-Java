@@ -27,7 +27,6 @@ public class TaskListMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println(ConsoleTexts.WELCOME_MESSAGE);
 		new TaskListMain().start();
 	}
 
@@ -40,6 +39,7 @@ public class TaskListMain {
 		try {
 			// setup the database.
 			loadSuccess = TaskListDAO.setupDB();
+			System.out.println(ConsoleTexts.WELCOME_MESSAGE);
 			// Infinite loop which is broken out of when the user enters the
 			// quit command.
 			cmdloop: while (loadSuccess) {
